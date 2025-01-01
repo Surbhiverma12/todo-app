@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {v4 as uuid} from 'uuid'
 
 const TodoBox = () => {
@@ -6,6 +6,21 @@ const TodoBox = () => {
   const [input, setInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [editInput, setEditInput] = useState({task: '', id: null})
+
+    // Load todos from localStorage when the component mounts
+    useEffect(() => {
+      const savedTodos = JSON.parse(localStorage.getItem("todo")) || [];
+      console.log("Loading the data",savedTodos)
+      if (todo) {
+        setTodo(savedTodos);
+      }
+    }, []);
+  
+    // Save todos to localStorage whenever the todos state changes
+    useEffect(() => {
+      console.log("saving the data")
+      localStorage.setItem("todo", JSON.stringify(todo));
+    }, [todo]);
 
   const getEditInput = (todos) => {
     setEditInput({task: todos.task, id: todos.id})
@@ -35,8 +50,10 @@ const TodoBox = () => {
       task: input,
       id: uuid()
     }
-    setTodo((preTodo) => [...preTodo, newTodo])
-    setInput('')
+    if(newTodo.task.length>0) {
+      setTodo((preTodo) => [...preTodo, newTodo])
+      setInput('')
+    }
   }
 
   const deleteTodo = (id) => {
